@@ -31,7 +31,13 @@ func UpdateObjectStorage(s storer.Storer, packfile io.Reader) error {
 		return WritePackfileToObjectStorage(pw, packfile)
 	}
 
-	p, err := NewParserWithStorage(NewScanner(packfile), s)
+	var obs []Observer
+	if ob, ok := s.(Observer); ok {
+		obs = make([]Observer, 1)
+		obs[0] = ob
+	}
+
+	p, err := NewParserWithStorage(NewScanner(packfile), s, obs...)
 	if err != nil {
 		return err
 	}
